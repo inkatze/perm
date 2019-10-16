@@ -17,10 +17,25 @@ def permutation(number: str):
     return results
 
 
-response = urllib.request.urlopen('https://csrng.net/csrng/csrng.php?min=0&max=10000')
-data = response.read().decode('utf-8')
-data = json.loads(data)
-value = str(data.pop()['random'])
+from flask import Flask
+app = Flask(__name__)
 
-for r in permutation(value):
-    print(r)
+@app.route("/")
+def hello():
+    return "<a href='/perms'>Trigger</a>"
+
+
+@app.route("/perms")
+def perms():
+    response = urllib.request.urlopen('https://csrng.net/csrng/csrng.php?min=0&max=10000')
+    data = response.read().decode('utf-8')
+    data = json.loads(data)
+    value = str(data.pop()['random'])
+
+    results = permutation(value)
+    for r in results:
+        print(r)
+    return str(results)
+
+if __name__ == "__main__":
+    app.run()
